@@ -1,5 +1,8 @@
 # ActiveSupport::Duration::HumanString
 
+Convert [ActiveSupport::Duration](https://api.rubyonrails.org/classes/ActiveSupport/Duration.html) objects to human-friendly strings like `'2h 30m 17s'`.
+Like [`distance_of_time_in_words`](https://api.rubyonrails.org/classes/ActionView/Helpers/DateHelper.html) helper but _exact_ rather than approximate.
+Like `#inspect` but more concise. Like `#iso8601` but more human readable rather than machine readable.
 
 ## Installation
 
@@ -19,7 +22,10 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+      duration = ActiveSupport::Duration.build(95)
+      duration.human_to_s # => '1m 35s'
+```
 
 ## Development
 
@@ -30,3 +36,8 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/TylerRick/activesupport-duration-human_string.
+
+##  Not really related
+
+- https://github.com/josedonizetti/ruby-duration
+- https://github.com/janko/as-duration

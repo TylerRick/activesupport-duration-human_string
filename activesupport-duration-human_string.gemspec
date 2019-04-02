@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.summary       = %q{Convert Duration objects to human-friendly strings like '2h 30m 17s'}
   spec.description   = %q{Convert ActiveSupport::Duration objects to human-friendly strings like '2h 30m 17s'. }
                        %q{Like distance_of_time_in_words helper but exact rather than approximate. }
-                       %q{Like #inspect but more concise. Like iso8601 but more human readable rather than machine readable.}
+                       %q{Like #inspect but more concise. Like #iso8601 but more human readable rather than machine readable.}
   spec.homepage      = "https://github.com/TylerRick/activesupport-duration-human_string"
 
   spec.metadata["homepage_uri"]    = spec.homepage
