@@ -13,15 +13,20 @@ module ActiveSupport
     #
     # ## Examples
     #
-    # duration = 65.seconds
-    # duration.human_str                            # =>  '1m 5s'
-    # duration.human_str(use_2_digit_numbers: true) # =>  '1m 05s'
-    #
-    # duration = ActiveSupport::Duration.build(3500)
+    # ```ruby
+    # duration = 3500.seconds
     # duration.human_str                 # =>  '58m 20s'
     # duration.human_str(delimiter: '')  # =>  '58m20s'
     # duration.human_str(separator: ' ') # =>  '58 m 20 s'
     # duration.human_str(delimiter: ', ', separator: ' ') # =>  '58 m, 20 s'
+    #
+    # duration = ActiveSupport::Duration.parse "P3Y6M4DT12H30M5S"
+    # # => 3 years, 6 months, 4 days, 12 hours, 30 minutes, and 5 seconds
+    #
+    # duration.human_str                  # => "3y 6m 4d 12h 30m 5s"
+    # (duration - 4.days).human_str       # => "3y 6m 12h 30m 5s"
+    # duration.human_str(delimiter: ', ') # => "3y, 6m, 4d, 12h, 30m, 5s"
+    # ```
     #
     # ## Options
     #
