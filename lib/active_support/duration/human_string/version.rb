@@ -1,4 +1,4 @@
-module Activesupport
+module ActiveSupport
   module Duration
     module HumanString
     def self.version

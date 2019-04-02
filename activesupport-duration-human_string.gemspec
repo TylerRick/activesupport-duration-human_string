@@ -1,11 +1,11 @@
 
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "activesupport/duration/human_string/version"
+require "active_support/duration/human_string/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "activesupport-duration-human_string"
-  spec.version       = Activesupport::Duration::HumanString.version
+  spec.version       = ActiveSupport::Duration::HumanString.version
   spec.authors       = ["Tyler Rick"]
   spec.email         = ["tyler@tylerrick.com"]
   spec.license       = "MIT"

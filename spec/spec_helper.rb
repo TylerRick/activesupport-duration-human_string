@@ -1,5 +1,5 @@
 require "bundler/setup"
-require "activesupport/duration/human_string"
+require "active_support/duration/human_string"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
