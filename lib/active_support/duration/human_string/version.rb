@@ -1,5 +1,5 @@
 module ActiveSupport
-  module Duration
+  class Duration
     module HumanString
     def self.version
       "0.1.0"

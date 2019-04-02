@@ -3,7 +3,6 @@
 require 'active_support/duration'
 
 module ActiveSupport
-        Duration
   class Duration
     # Returns a concise and human-readable string, like '3h' or '3h 5m 7s'
     # This is unlike #to_s, which is concise but not very human-readable (gives time in seconds even for large durations),
