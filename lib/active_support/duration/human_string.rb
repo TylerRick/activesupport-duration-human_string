@@ -7,6 +7,16 @@ module ActiveSupport
     # Returns a concise and human-readable string, like '3h' or '3h 5m 7s'
     # This is unlike #to_s, which is concise but not very human-readable (gives time in seconds even for large durations),
     # This is unlike #iso8601, which is concise but not very human-readable ("P3Y6M4DT12H30M5S").
+    #
+    # The +precision+ parameter can be used to limit seconds' precision of duration.
+    #
+    # +use_2_digit_numbers+: Set to true if you want to pad 1-digit nubers to 2 digits ('3h 05m 07s'
+    # instead of '3h 5m 7s'). Never pads the first part of the duration, only later parts.
+    def human_str(precision: nil, use_two_digit_numbers: true)
+      HumanStringSerializer.new(self, precision: precision).serialize
+    end
+    alias_method :human_to_s, :human_str
+
     def human_to_s
       iso8601.
         sub('P', '').
@@ -27,8 +37,7 @@ end
 
 module ActiveSupport
   class Duration
-    # Serializes duration to string according to ISO 8601 Duration format.
-    class ISO8601Serializer # :nodoc:
+    class HumanStringSerializer # :nodoc:
       def initialize(duration, precision: nil)
         @duration = duration
         @precision = precision

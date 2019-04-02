@@ -2,7 +2,7 @@
 
 Convert [ActiveSupport::Duration](https://api.rubyonrails.org/classes/ActiveSupport/Duration.html) objects to human-friendly strings like `'2h 30m 17s'`.
 Like [`distance_of_time_in_words`](https://api.rubyonrails.org/classes/ActionView/Helpers/DateHelper.html) helper but _exact_ rather than approximate.
-Like `#inspect` but more concise. Like `#iso8601` but more human readable rather than machine readable.
+Like `#inspect` but more concise. Like [`#iso8601`](https://api.rubyonrails.org/classes/ActiveSupport/Duration.html#method-i-iso8601) but more human readable rather than machine readable.
 
 ## Installation
 
