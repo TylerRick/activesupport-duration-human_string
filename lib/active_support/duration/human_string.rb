@@ -1,86 +1,88 @@
-# Similar to: active_support/duration/iso8601_serializer.rb
-
 require 'active_support/duration'
+require 'active_support/duration/iso8601_serializer'
 
 module ActiveSupport
   class Duration
-    # Returns a concise and human-readable string, like '3h' or '3h 5m 7s'
-    # This is unlike #to_s, which is concise but not very human-readable (gives time in seconds even for large durations),
-    # This is unlike #iso8601, which is concise but not very human-readable ("P3Y6M4DT12H30M5S").
+    # Convert [ActiveSupport::Duration](https://api.rubyonrails.org/classes/ActiveSupport/Duration.html) objects to human-friendly strings like `'2h 30m 17s'`.
     #
-    # The +precision+ parameter can be used to limit seconds' precision of duration.
+    # Like [`distance_of_time_in_words`](https://api.rubyonrails.org/classes/ActionView/Helpers/DateHelper.html) helper but _exact_ rather than approximate.
+    # Like `#inspect` but more concise. Like [`#iso8601`](https://api.rubyonrails.org/classes/ActiveSupport/Duration.html#method-i-iso8601) but more human readable rather than machine readable.
     #
-    # +use_2_digit_numbers+: Set to true if you want to pad 1-digit nubers to 2 digits ('3h 05m 07s'
+    # Note that the unit 'm' is used for both months and minutes.
+    #
+    # ## Examples
+    #
+    # duration = ActiveSupport::Duration.build(3500)
+    # duration.human_str                 # =>  '58m 20s'
+    # duration.human_str(delimiter: '')  # =>  '58m20s'
+    # duration.human_str(separator: ' ') # =>  '58 m 20 s'
+    # duration.human_str(delimiter: ', ', separator: ' ') # =>  '58 m, 20 s'
+    #
+    # duration = ActiveSupport::Duration.build(65)
+    # duration.human_str(use_2_digit_numbers: true) # =>  '1m 05s'
+    #
+    # ## Options
+    #
+    # `:precision`: Precision of seconds (defaults to nil, which is no digits after decimal).
+    #
+    # `:separator`: The separator between the digits and units (defaults to '', giving for example '3h' with nothing between them).
+    #
+    # `:delimiter`: The delimiter between different parts like minutes and seconds (defaults to ' ').
+    #
+    # `use_2_digit_numbers`: Set to true if you want to pad 1-digit nubers to 2 digits ('3h 05m 07s'
     # instead of '3h 5m 7s'). Never pads the first part of the duration, only later parts.
-    def human_str(precision: nil, use_two_digit_numbers: true)
-      HumanStringSerializer.new(self, precision: precision).serialize
+    #
+    def human_str(precision: nil, separator: '', delimiter: ' ', use_2_digit_numbers: false)
+      HumanStringSerializer.new(
+        self,
+        precision: precision,
+        separator: separator,
+        delimiter: delimiter,
+        use_2_digit_numbers: use_2_digit_numbers,
+      ).serialize
     end
-    alias_method :human_to_s, :human_str
-
-    def human_to_s
-      iso8601.
-        sub('P', '').
-        sub('T', '').
-        downcase.
-        gsub(/
-          # We only want to pad all *except* the first "\d\D" part
-          (\D+)  # Preceeded by: a non-digit
-          (\d+)  # A digit
-        /x) { '%s%02d' % [$1, $2.to_i] }.
-        gsub(/
-          \D    # Not a digit
-          (?!$) # Not at end
-        /x) { |m| "#{m} " }
-    end
+    alias_method :to_human_s, :human_str
   end
 end
 
 module ActiveSupport
   class Duration
-    class HumanStringSerializer # :nodoc:
-      def initialize(duration, precision: nil)
-        @duration = duration
-        @precision = precision
+    # Based on: active_support/duration/iso8601_serializer.rb
+    # Inherits: #normalize
+    class HumanStringSerializer < ISO8601Serializer
+      def initialize(duration, precision: nil, separator: '', delimiter: ' ', use_2_digit_numbers: false)
+        @duration            = duration
+        @precision           = precision
+        @separator           = separator
+        @delimiter           = delimiter
+        @use_2_digit_numbers = use_2_digit_numbers
       end
 
-      # Builds and returns output string.
+      # Builds and returns output_parts string.
       def serialize
         parts, sign = normalize
-        return "PT0S".freeze if parts.empty?
 
-        output = "P"
-        output << "#{parts[:years]}Y"   if parts.key?(:years)
-        output << "#{parts[:months]}M"  if parts.key?(:months)
-        output << "#{parts[:weeks]}W"   if parts.key?(:weeks)
-        output << "#{parts[:days]}D"    if parts.key?(:days)
-        time = ""
-        time << "#{parts[:hours]}H"     if parts.key?(:hours)
-        time << "#{parts[:minutes]}M"   if parts.key?(:minutes)
+        output_parts = []
+        output_parts << [parts[:years],   'y'] if parts.key?(:years)
+        output_parts << [parts[:months],  'm'] if parts.key?(:months)
+        output_parts << [parts[:weeks],   'w'] if parts.key?(:weeks)
+        output_parts << [parts[:days],    'd'] if parts.key?(:days)
+        output_parts << [parts[:hours],   'h'] if parts.key?(:hours)
+        output_parts << [parts[:minutes], 'm'] if parts.key?(:minutes)
         if parts.key?(:seconds)
-          time << "#{sprintf(@precision ? "%0.0#{@precision}f" : '%g', parts[:seconds])}S"
+          output_parts << [sprintf(@precision ? "%0.0#{@precision}f" : '%g', parts[:seconds]), 's']
         end
-        output << "T#{time}" unless time.empty?
+
+        output_parts.map!.with_index { |(n, units), i|
+          if @use_2_digit_numbers && i >= 1
+            n = sprintf('%02d', n)
+          end
+          "#{n}#{@separator}#{units}"
+        }
+
+        output = output_parts.join(@delimiter)
         "#{sign}#{output}"
       end
-
-      private
-
-        # Return pair of duration's parts and whole duration sign.
-        # Parts are summarized (as they can become repetitive due to addition, etc).
-        # Zero parts are removed as not significant.
-        # If all parts are negative it will negate all of them and return minus as a sign.
-        def normalize
-          parts = @duration.parts.each_with_object(Hash.new(0)) do |(k, v), p|
-            p[k] += v  unless v.zero?
-          end
-          # If all parts are negative - let's make a negative duration
-          sign = ""
-          if parts.values.all? { |v| v < 0 }
-            sign = "-"
-            parts.transform_values!(&:-@)
-          end
-          [parts, sign]
-        end
     end
   end
 end
