@@ -42,7 +42,7 @@ module ActiveSupport
     #
     def human_str(precision: nil, separator: '', delimiter: ' ', use_2_digit_numbers: false)
       HumanStringSerializer.new(
-        self,
+        self.class.build(value),
         precision: precision,
         separator: separator,
         delimiter: delimiter,
