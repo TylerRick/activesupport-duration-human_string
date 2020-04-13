@@ -1,5 +1,6 @@
 require "bundler/setup"
 require "active_support/duration/human_string"
+require 'byebug' rescue nil
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
