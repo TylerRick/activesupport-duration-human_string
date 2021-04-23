@@ -57,7 +57,7 @@ module ActiveSupport
       reset = false
       new_parts = {}
       new_parts[:years]   = options.fetch(:years,               parts[:years])  ; reset = options.key?(:years)
-      new_parts[:month]   = options.fetch(:months,  reset ? 0 : parts[:months]) ; reset = options.key?(:months)
+      new_parts[:months]  = options.fetch(:months,  reset ? 0 : parts[:months]) ; reset = options.key?(:months)
       new_parts[:days]    = options.fetch(:days,    reset ? 0 : parts[:days])   ; reset = options.key?(:days)
       new_parts[:hours]   = options.fetch(:hours,   reset ? 0 : parts[:hours])  ; reset = options.key?(:hours)
       new_parts[:minutes] = options.fetch(:minutes, reset ? 0 : parts[:minutes]); reset = options.key?(:minutes)
